@@ -5,7 +5,7 @@
 #include "UThrComSerial.h"
 #pragma package(smart_init)
 //---------------------------------------------------------------------------
-__fastcall ThrComSerial::ThrComSerial(bool CreateSuspended, String comPort, String baudrate)
+__fastcall TThrComSerial::TThrComSerial(bool CreateSuspended, String comPort, String baudrate)
    : TThread(CreateSuspended)
 {
    onAtualizacaoDados = NULL;
@@ -16,35 +16,65 @@ __fastcall ThrComSerial::ThrComSerial(bool CreateSuspended, String comPort, Stri
    //Com->DTROFF();
 }
 //---------------------------------------------------------------------------
-__fastcall ThrComSerial::~ThrComSerial()
+__fastcall TThrComSerial::~TThrComSerial()
 {
    if(Com != NULL) delete Com;
 }
 //---------------------------------------------------------------------------
-void __fastcall ThrComSerial::Execute()
+void __fastcall TThrComSerial::Execute()
 {
-   //---- Thread Start ----
+
    while(!Terminated)
-   {               
+   {
       //tratar dados serial de 1 em 1s
       //trataDados();
+      static int index = 0;
+        int byte_recebido;
 
-      //Aguarda 1s e a cada 10ms verifica pedidos
+      //Aguarda 1s e a cada 100ms verifica pedidos
       for(int i = 0; i < 10 && !Terminated; i++)
       {
+
+         if(doSendAscii==true){
+
+         }
+
          Sleep(100);
-         // verifica estados...
-      }
-   }
+        }
+    }
+
+    Sleep(1); //Dormir 1ms para liberar outros processos fora desta thread
+
+    //Esta certa forma de acessar formMain->ComDebug->Getc() ???
+    while((byte_recebido = ComDebug->Getc()) != -1)
+    {
+        if(byte_recebido == '\n' || index > 2046)
+        {
+            DebugStatusATM.Com.buffer[index] = '\0';
+            //Pronto para atualizar formulario
+            if(onAtualizaMemoDebug != NULL)
+               Synchronize(onAtualizaMemoDebug);
+            index = 0;
+         }
+         else
+         {
+            DebugStatusATM.Com.buffer[index++] = byte_recebido;
+         }
+    }
 }
 //---------------------------------------------------------------------------
+void __fastcall TThrComSerial::sendAscii(String msg)
+{
+    SendBuffer=msg;
+    doSendAscii=true;
+}
 /*
-void __fastcall ThrComSerial::trataDados()
+void __fastcall TThrComSerial::trataDados()
 {
    if(onAtualizacaoDados != NULL)   Synchronize(onAtualizacaoDados);
 }
 //---------------------------------------------------------------------------
-int __fastcall ThrComSerial::sendRecv(unsigned char cmd, const void* dados, int length, void* dados_rec, int dados_rec_len_max, int* dados_rec_len)
+int __fastcall TThrComSerial::sendRecv(unsigned char cmd, const void* dados, int length, void* dados_rec, int dados_rec_len_max, int* dados_rec_len)
 {
    int tamanho_enviar;
    //foram declarados globalmente
@@ -110,7 +140,7 @@ int __fastcall ThrComSerial::sendRecv(unsigned char cmd, const void* dados, int 
    return -1;
 }
 //---------------------------------------------------------------------------  
-int __fastcall ThrComSerial::monta_pacote(TAtmMonResult* pkt, unsigned char cmd, unsigned char sequencia)
+int __fastcall TThrComSerial::monta_pacote(TAtmMonResult* pkt, unsigned char cmd, unsigned char sequencia)
 {
    int byte_recebido;
    unsigned char* buffer;
@@ -202,7 +232,7 @@ int __fastcall ThrComSerial::monta_pacote(TAtmMonResult* pkt, unsigned char cmd,
    }
 }
 //---------------------------------------------------------------------------
-void __fastcall ThrComSerial::reset()
+void __fastcall TThrComSerial::reset()
 {
    if(StatusATM.pedidoReset == 1)// pedido reset via firmware
       sendRecv(0xAA, NULL, 0, NULL, 0, NULL);

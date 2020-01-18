@@ -23,7 +23,8 @@ public:		// User declarations
     TThrComSerial *ThrComSerial;
     __fastcall TForm1(TComponent* Owner);
     __fastcall ~TForm1();
-    void Log(String str);
+    __fastcall void Log(String str);
+    __fastcall void AtualizacaoDados();
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TForm1 *Form1;
