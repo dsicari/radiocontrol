@@ -1,8 +1,8 @@
 object Form1: TForm1
-  Left = 192
-  Top = 107
-  Width = 1305
-  Height = 675
+  Left = 1116
+  Top = 517
+  Width = 732
+  Height = 402
   Caption = 'Form1'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -13,4 +13,15 @@ object Form1: TForm1
   OldCreateOrder = False
   PixelsPerInch = 96
   TextHeight = 13
+  object Memo1: TMemo
+    Left = 0
+    Top = 144
+    Width = 724
+    Height = 231
+    Align = alBottom
+    Lines.Strings = (
+      'Memo1')
+    ScrollBars = ssVertical
+    TabOrder = 0
+  end
 end

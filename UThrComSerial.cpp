@@ -5,58 +5,46 @@
 #include "UThrComSerial.h"
 #pragma package(smart_init)
 //---------------------------------------------------------------------------
-__fastcall TThrComSerial::TThrComSerial(bool CreateSuspended, String comPort, String baudrate)
+__fastcall ThrComSerial::ThrComSerial(bool CreateSuspended, String comPort, String baudrate)
    : TThread(CreateSuspended)
 {
    onAtualizacaoDados = NULL;
    Com = NULL;
-   StatusATM.comOnline(0);
-   StatusATM.Com.comPort = comPort;
-   StatusATM.Com.baudrate = baudrate;
 
-   Com = new TComSerial(Com, StatusATM.Com.comPort, StatusATM.Com.baudrate.ToInt());
+   Com = new TComSerial(Com, comPort, baudrate.ToInt());
    Com->Open();
    //Com->DTROFF();
-   StatusATM.comOnline(1);
-
-   StatusATM.pedidoEstadoRele2 = 255;
-   StatusATM.pedidoEstadoRele3 = 255;
 }
 //---------------------------------------------------------------------------
-__fastcall TThrComSerial::~TThrComSerial()
+__fastcall ThrComSerial::~ThrComSerial()
 {
    if(Com != NULL) delete Com;
 }
 //---------------------------------------------------------------------------
-void __fastcall TThrComSerial::Execute()
+void __fastcall ThrComSerial::Execute()
 {
    //---- Thread Start ----
    while(!Terminated)
    {               
       //tratar dados serial de 1 em 1s
-      trataDados();
+      //trataDados();
 
       //Aguarda 1s e a cada 10ms verifica pedidos
       for(int i = 0; i < 10 && !Terminated; i++)
       {
          Sleep(100);
-         //verifica
-         if(StatusATM.pedidoFirmware == 1)
-            firmware();
-         if(StatusATM.pedidoReset > 0)
-            reset();
-         if(StatusATM.pedidoRele2 == 1 || StatusATM.pedidoRele3 == 1)
-            rele();
+         // verifica estados...
       }
    }
 }
 //---------------------------------------------------------------------------
-void __fastcall TThrComSerial::trataDados()
+/*
+void __fastcall ThrComSerial::trataDados()
 {
    if(onAtualizacaoDados != NULL)   Synchronize(onAtualizacaoDados);
 }
 //---------------------------------------------------------------------------
-int __fastcall TThrComSerial::sendRecv(unsigned char cmd, const void* dados, int length, void* dados_rec, int dados_rec_len_max, int* dados_rec_len)
+int __fastcall ThrComSerial::sendRecv(unsigned char cmd, const void* dados, int length, void* dados_rec, int dados_rec_len_max, int* dados_rec_len)
 {
    int tamanho_enviar;
    //foram declarados globalmente
@@ -122,7 +110,7 @@ int __fastcall TThrComSerial::sendRecv(unsigned char cmd, const void* dados, int
    return -1;
 }
 //---------------------------------------------------------------------------  
-int __fastcall TThrComSerial::monta_pacote(TAtmMonResult* pkt, unsigned char cmd, unsigned char sequencia)
+int __fastcall ThrComSerial::monta_pacote(TAtmMonResult* pkt, unsigned char cmd, unsigned char sequencia)
 {
    int byte_recebido;
    unsigned char* buffer;
@@ -214,7 +202,7 @@ int __fastcall TThrComSerial::monta_pacote(TAtmMonResult* pkt, unsigned char cmd
    }
 }
 //---------------------------------------------------------------------------
-void __fastcall TThrComSerial::reset()
+void __fastcall ThrComSerial::reset()
 {
    if(StatusATM.pedidoReset == 1)// pedido reset via firmware
       sendRecv(0xAA, NULL, 0, NULL, 0, NULL);
@@ -244,4 +232,4 @@ void __fastcall TThrComSerial::reset()
    //volta status requestReset para zero
    StatusATM.requestReset(0);
 }
-
+*/
