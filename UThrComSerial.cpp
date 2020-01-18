@@ -24,7 +24,7 @@ __fastcall TThrComSerial::~TThrComSerial()
 void __fastcall TThrComSerial::Execute()
 {
 
-   while(!Terminated)
+   /*while(!Terminated)
    {
       //tratar dados serial de 1 em 1s
       //trataDados();
@@ -60,7 +60,7 @@ void __fastcall TThrComSerial::Execute()
          {
             DebugStatusATM.Com.buffer[index++] = byte_recebido;
          }
-    }
+    } */
 }
 //---------------------------------------------------------------------------
 void __fastcall TThrComSerial::sendAscii(String msg)
