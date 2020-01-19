@@ -1,7 +1,7 @@
 object mainForm: TmainForm
-  Left = 609
-  Top = 302
-  Width = 732
+  Left = 502
+  Top = 235
+  Width = 610
   Height = 402
   Caption = 'Radio Control'
   Color = clBtnFace
@@ -16,9 +16,9 @@ object mainForm: TmainForm
   TextHeight = 13
   object Memo1: TMemo
     Left = 0
-    Top = 168
-    Width = 724
-    Height = 207
+    Top = 272
+    Width = 602
+    Height = 103
     Align = alBottom
     Lines.Strings = (
       'Memo1')
@@ -178,6 +178,22 @@ object mainForm: TmainForm
       Caption = 'btnControlRTS'
       TabOrder = 1
       OnClick = btnControlRTSClick
+    end
+  end
+  object GroupBox4: TGroupBox
+    Left = 8
+    Top = 160
+    Width = 337
+    Height = 105
+    Caption = 'CAT Commands'
+    TabOrder = 3
+    object btnCATCmdFA: TButton
+      Left = 16
+      Top = 32
+      Width = 75
+      Height = 25
+      Caption = 'Frequency'
+      TabOrder = 0
     end
   end
 end

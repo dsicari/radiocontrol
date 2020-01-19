@@ -38,6 +38,8 @@ __published:	// IDE-managed Components
     TLabel *lblControlDeviceRTS;
     TLabel *lblStatusDeviceDTR;
     TLabel *lblStatusDeviceRTS;
+    TGroupBox *GroupBox4;
+    TButton *btnCATCmdFA;
     void __fastcall btnOpenComPortDeviceClick(TObject *Sender);
     void __fastcall btnControlDTRClick(TObject *Sender);
     void __fastcall btnControlRTSClick(TObject *Sender);
