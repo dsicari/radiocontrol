@@ -7,9 +7,9 @@
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma resource "*.dfm"
-TmainForm *mainForm;
+TMainForm *MainForm;
 //---------------------------------------------------------------------------
-__fastcall TmainForm::TmainForm(TComponent* Owner)
+__fastcall TMainForm::TMainForm(TComponent* Owner)
     : TForm(Owner)
 {
     Memo1->Clear();
@@ -36,19 +36,9 @@ __fastcall TmainForm::TmainForm(TComponent* Owner)
         lblControlDeviceDTR->Caption = Ini->ReadString("DEVICE", "ONDTR", "DEVICE 1");
         lblControlDeviceRTS->Caption = Ini->ReadString("DEVICE", "ONRTS", "DEVICE 2");
     }
-
-   /* if(ThrComSerial==NULL){
-        ThrComSerial = new TThrComSerial(true, "COM3", 115200);
-        ThrComSerial->onAtualizacaoDados = AtualizacaoDados;
-        ThrComSerial->Resume();
-        Log("Conectado");  
-    }
-    else{
-        Log("ThrComSerial is not null");
-    }     */
 }
 //---------------------------------------------------------------------------
-__fastcall TmainForm::~TmainForm()
+__fastcall TMainForm::~TMainForm()
 {
     if(Ini != NULL) delete Ini;
 
@@ -59,49 +49,23 @@ __fastcall TmainForm::~TmainForm()
     }
 }
 //---------------------------------------------------------------------------
-void TmainForm::Log(String str)
+void TMainForm::Log(String str)
 {
     Memo1->Lines->Add(DateTimeToStr(Now()) + " " + str);
 }
 //---------------------------------------------------------------------------
-void TmainForm::AtualizacaoDados()
+void __fastcall TMainForm::btnOpenComPortDeviceClick(TObject *Sender)
 {
-    // ...
-}
-//---------------------------------------------------------------------------
-void __fastcall TmainForm::btnOpenComPortDeviceClick(TObject *Sender)
-{
-    /*if(ComSerial != NULL){
-        return;
-    }
-    else
-    {
-        try
-        {
-            ComSerial = new TComSerial(ComSerial, editComPortDevice->Text, editComBaudrateDevice->Text.ToInt());
-            ComSerial->Open();
-            Log("ok");
-        }
-        catch(Exception& e)
-        {
-            if(ComSerial != NULL)
-            {
-                delete ComSerial;
-                ComSerial=NULL;
-            }
-        }
-   }   */
+   if(ComSerial!=NULL && ComSerial->Enabled()){
+      ComSerial->Close();
+      delete ComSerial;
+      ComSerial=NULL;
+      btnOpenComPortDevice->Caption="Open";
+      Log("Success closing comport");
+      return;
+   }
 
-    if(ComSerial!=NULL && ComSerial->Enabled()){
-        ComSerial->Close();
-        delete ComSerial;
-        ComSerial=NULL;
-        btnOpenComPortDevice->Caption = "Open";
-        Log("Success closing comport");
-        return;
-    }
-
-    try{
+     try{
         if(ComSerial!=NULL){
             delete ComSerial;
             ComSerial=NULL;
@@ -132,11 +96,9 @@ void __fastcall TmainForm::btnOpenComPortDeviceClick(TObject *Sender)
             ComSerial=NULL;
         }
     }
-
 }
 //---------------------------------------------------------------------------
-
-void __fastcall TmainForm::btnControlDTRClick(TObject *Sender)
+void __fastcall TMainForm::btnControlDTRClick(TObject *Sender)
 {
     if(ComSerial!=NULL && ComSerial->Enabled()){
         if(btnControlDTR->Caption == "TURN OFF"){
@@ -158,7 +120,7 @@ void __fastcall TmainForm::btnControlDTRClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TmainForm::btnControlRTSClick(TObject *Sender)
+void __fastcall TMainForm::btnControlRTSClick(TObject *Sender)
 {
     if(ComSerial!=NULL && ComSerial->Enabled()){
         if(btnControlRTS->Caption == "TURN OFF"){
@@ -177,6 +139,44 @@ void __fastcall TmainForm::btnControlRTSClick(TObject *Sender)
     else{
         Log("Comport not open");
     }
+}
+//---------------------------------------------------------------------------
+void __fastcall TMainForm::btnOpenComPortCATClick(TObject *Sender)
+{
+   if(ThrComSerial==NULL){
+      ThrComSerial = new TThrComSerial(true, editComPortCAT->Text, editComBaudrateCAT->Text.ToIntDef(38400));
+      ThrComSerial->onAtualizacaoDados = AtualizacaoDados;
+      ThrComSerial->Resume();
+      Log("ThrComSerial OK");
+      btnOpenComPortCAT->Caption="Close";
+    }
+    else{
+      ThrComSerial->Terminate();
+      ThrComSerial->WaitFor();
+      delete ThrComSerial;
+      ThrComSerial = NULL;
+      btnOpenComPortCAT->Caption="Open";
+      Log("ThrComSerial Closed");
+    }    
+}
+//---------------------------------------------------------------------------
+void __fastcall TMainForm::AtualizacaoDados()
+{
+   if(ThrComSerial != NULL)
+   {
+      if(ThrComSerial->LastError != "")
+         Log("ThrComSerial ERROR: " + ThrComSerial->LastError);
+       if(ThrComSerial->LastMessage != "")
+         Log("ThrComSerial Message: " + ThrComSerial->LastMessage);
+      if(ThrComSerial->BufferRX != "")
+         Log("ThrComSerial Received: " + ThrComSerial->BufferRX);
+   }
+}
+void __fastcall TMainForm::btnCATCmdFAClick(TObject *Sender)
+{
+   if(ThrComSerial != NULL){
+      ThrComSerial->Send("FA;");
+   }
 }
 //---------------------------------------------------------------------------
 

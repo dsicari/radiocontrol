@@ -1,6 +1,6 @@
-object mainForm: TmainForm
-  Left = 502
-  Top = 235
+object MainForm: TMainForm
+  Left = 1317
+  Top = 591
   Width = 610
   Height = 402
   Caption = 'Radio Control'
@@ -74,6 +74,7 @@ object mainForm: TmainForm
         Height = 25
         Caption = 'Open'
         TabOrder = 2
+        OnClick = btnOpenComPortCATClick
       end
     end
     object GroupBox3: TGroupBox
@@ -194,6 +195,7 @@ object mainForm: TmainForm
       Height = 25
       Caption = 'Frequency'
       TabOrder = 0
+      OnClick = btnCATCmdFAClick
     end
   end
 end

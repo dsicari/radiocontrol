@@ -7,24 +7,36 @@
 
 #include "UComSerial.h"
 
+#define TIMEOUT_RX      1000
+#define TAM_MAX_BUFFER  64
+#define RETRIES         3
+
+#define COM_OK          0
+#define RX_BUFFER_OK    0
+#define COM_NOT_OPEN   -1
+#define COM_ERROR      -2
+#define RX_BUFFER_TOUT -3
+
+#ifndef MS_TIMER
+   #define MS_TIMER ((unsigned long)GetTickCount())
+#endif
+
 //---------------------------------------------------------------------------
-class TThrSerialCom : public TThread
+class TThrComSerial : public TThread
 {
    public:
       enum TSTThread {stIdle = 0, stRunning = 1};
 
    private:
-      UINT16 __fastcall CRC_Calc(unsigned char *pbData, int iLength);
       String __fastcall BufferToString(const void *_buffer, int len, bool forceHex = false);
       int __fastcall CheckComm();
-      int __fastcall SendAbort();
       int __fastcall RcvComm(unsigned char *buffer, int *len_rx, unsigned long msTimeout = TIMEOUT_RX);
-      bool EnviarCmd;
+      int __fastcall SendRcv(String input, String *output);
+      bool Enviar;
       bool CancelaRcv;
-      String Msg2Send;
-
-      String FCmd2Send;
-      void __fastcall SetCmd2Send(String value);
+      String BufferTX;
+      String ComPort;
+      int BaudRate;
 
       TSTThread FSTThread;
       void __fastcall SetSTThread(TSTThread value);
@@ -34,18 +46,18 @@ class TThrSerialCom : public TThread
       TComSerial* Comm;
 
    public:
-      String StrBufferRX;
+      String BufferRX;
+      String LastError;
+      String LastMessage;
 
-      __fastcall TThrSerialCom(bool CreateSuspended);
-      __fastcall ~TThrSerialCom();
+      __fastcall TThrComSerial(bool CreateSuspended, String comPort, int baudrate);
+      __fastcall ~TThrComSerial();
 
-      int __fastcall OpenSerialPort(String comPort, int baudRate);
-      int __fastcall CloseSerialPort();
-      int __fastcall Send(String cmd, String msg, bool retornarUltimaFBlocante = false);
-      int __fastcall SendRcv(String cmd, String msg, String *output, bool receberApenasACK = false);
+      bool __fastcall OpenSerialPort(String comPort, int baudRate);
+      bool __fastcall CloseSerialPort();
+      void __fastcall Send(String input);
 
       __property TSTThread STThread = {read = FSTThread, write = SetSTThread};
-      __property String Cmd2Send = {read = FCmd2Send, write = SetCmd2Send};
 
       // Eventos gerados
       TThreadMethod onAtualizacaoDados;
